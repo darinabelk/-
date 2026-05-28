@@ -1154,7 +1154,7 @@ button {
   }
 
   .hero {
-    min-height: 450px;
+    min-height: 340px;
   }
 
   .hero-copy {
@@ -1181,7 +1181,7 @@ button {
   }
 
   .hero-media {
-    bottom: 68px;
+    bottom: 90px;
     height: 106px;
   }
 
