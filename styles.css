@@ -26,6 +26,8 @@
   --container: 1440px;
   --font-heading: "Cygre Black", Arial, Helvetica, sans-serif;
   --font-body: "Montserrat Medium", Montserrat, Arial, Helvetica, sans-serif;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --reveal-duration: 640ms;
 }
 
 * {
@@ -66,6 +68,39 @@ button {
   font: inherit;
 }
 
+@keyframes headerDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.site-header {
+  animation: headerDrop 520ms var(--ease-out) both;
+}
+
+.js .reveal {
+  opacity: 0;
+  filter: blur(7px);
+  transform: translateY(28px);
+  transition:
+    opacity var(--reveal-duration) var(--ease-out),
+    filter var(--reveal-duration) var(--ease-out),
+    transform var(--reveal-duration) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.js .reveal.is-visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
 .container {
   width: min(var(--container), calc(100% - 96px));
   margin: 0 auto;
@@ -102,6 +137,11 @@ button {
   color: #2f2f2d;
   font-weight: 700;
   font-size: 17px;
+}
+
+.menu-toggle,
+.mobile-menu {
+  display: none;
 }
 
 .main-nav a,
@@ -186,6 +226,14 @@ button {
 .button:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.js .button.reveal.is-visible:hover {
+  transform: translateY(-2px);
+}
+
+.button:active {
+  transform: translateY(0);
 }
 
 .hero-button {
@@ -283,12 +331,16 @@ button {
   display: flex;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 180ms ease;
+  transform: translateY(12px) scale(0.985);
+  transition:
+    opacity 320ms ease,
+    transform 420ms var(--ease-out);
 }
 
 .myth-slide.is-active {
   opacity: 1;
   pointer-events: auto;
+  transform: translateY(0) scale(1);
 }
 
 .myth-slide img {
@@ -314,6 +366,10 @@ button {
 .round-arrow:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+}
+
+.round-arrow:active {
+  transform: translateY(0) scale(0.96);
 }
 
 .round-arrow span {
@@ -373,12 +429,18 @@ button {
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
+  transform: translateX(18px);
+  transition:
+    opacity 340ms ease,
+    transform 480ms var(--ease-out),
+    visibility 340ms ease;
 }
 
 .story-slide.is-active {
   opacity: 1;
   pointer-events: auto;
   visibility: visible;
+  transform: translateX(0);
 }
 
 .story-media {
@@ -416,6 +478,11 @@ button {
 
 .story-media img {
   filter: grayscale(1);
+  transition: transform 700ms var(--ease-out), filter 360ms ease;
+}
+
+.story-media:hover img {
+  transform: scale(1.025);
 }
 
 .story-name {
@@ -528,6 +595,22 @@ button {
   background: var(--bg);
   cursor: pointer;
   text-align: left;
+  transition:
+    background 220ms ease,
+    transform 220ms var(--ease-out),
+    box-shadow 220ms ease;
+}
+
+.problem-card:hover,
+.problem-card:focus-visible {
+  background: var(--paper);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
+}
+
+.js .problem-card.reveal.is-visible:hover,
+.js .problem-card.reveal.is-visible:focus-visible {
+  transform: translateY(-3px);
 }
 
 .problem-card:nth-child(2n) {
@@ -560,6 +643,12 @@ button {
   object-fit: contain;
   object-position: right bottom;
   opacity: 1;
+  transition: transform 520ms var(--ease-out);
+}
+
+.problem-card:hover picture img,
+.problem-card:focus-visible picture img {
+  transform: scale(1.035);
 }
 
 .problem-card:nth-child(2) picture,
@@ -684,16 +773,46 @@ button {
   gap: 16px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 180ms ease;
+  transform: translateY(12px);
+  transition:
+    opacity 340ms ease,
+    transform 460ms var(--ease-out);
 }
 
 .gallery-page.is-active {
   opacity: 1;
   pointer-events: auto;
+  transform: translateY(0);
 }
 
 .gallery-page img {
   filter: grayscale(1);
+  transition: filter 260ms ease, transform 520ms var(--ease-out);
+}
+
+.gallery-page img:hover {
+  filter: grayscale(0.35);
+  transform: scale(1.025);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .js .reveal {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
 }
 
 .gallery-page .g1 {
@@ -948,10 +1067,13 @@ button {
 
   main,
   .section,
-  .site-header,
   .site-footer {
     max-width: 100%;
     overflow-x: hidden;
+  }
+
+  .site-header {
+    overflow: visible;
   }
 
   .container {
@@ -962,6 +1084,8 @@ button {
   .header-inner {
     height: 48px;
     border-bottom-width: 2px;
+    position: relative;
+    z-index: 6;
   }
 
   .brand {
@@ -969,37 +1093,72 @@ button {
   }
 
   .main-nav {
-    position: relative;
-    flex: 0 0 22px;
-    width: 22px;
-    height: 22px;
-    margin-left: auto;
-    gap: 0;
-    border-radius: 2px;
-    background: var(--accent);
-  }
-
-  .main-nav a {
     display: none;
   }
 
-  .main-nav::before {
-    content: "";
-    position: absolute;
-    left: 5px;
-    right: 5px;
-    top: 6px;
-    height: 2px;
+  .menu-toggle {
+    width: 40px;
+    height: 40px;
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    border: 0;
+    border-radius: 5px;
     background: var(--white);
-    box-shadow: 0 5px 0 var(--white), 0 10px 0 var(--white);
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  .menu-toggle span {
+    width: 23px;
+    height: 2px;
+    display: block;
+    background: currentColor;
+  }
+
+  .mobile-menu {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: 5;
+    display: block;
+    min-height: calc(100vh - 48px);
+    min-height: calc(100dvh - 48px);
+    padding: 0 15px 24px;
+    background: var(--bg);
+  }
+
+  .mobile-menu[hidden] {
+    display: none;
+  }
+
+  .mobile-menu a {
+    min-height: 61px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 2px solid rgba(47, 47, 45, 0.14);
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1.1;
+    text-align: center;
+  }
+
+  html.nav-open,
+  body.nav-open {
+    overflow: hidden;
   }
 
   .hero {
-    min-height: 490px;
+    min-height: 450px;
   }
 
   .hero-copy {
-    padding-top: 58px;
+    padding-top: 54px;
   }
 
   .hero-copy p {
@@ -1014,7 +1173,7 @@ button {
   }
 
   .hero h1 {
-    margin-top: 35px;
+    margin-top: 30px;
     width: 100%;
     font-size: 34px;
     line-height: 0.92;
@@ -1022,7 +1181,7 @@ button {
   }
 
   .hero-media {
-    bottom: 86px;
+    bottom: 68px;
     height: 106px;
   }
 
@@ -1040,7 +1199,7 @@ button {
   .hero-button {
     left: 15px;
     right: 15px;
-    bottom: 28px;
+    bottom: 22px;
     width: auto;
     min-width: 0;
   }
@@ -1055,12 +1214,12 @@ button {
   }
 
   .article-section {
-    min-height: 482px;
-    padding: 16px 0 31px;
+    min-height: 410px;
+    padding: 16px 0 22px;
   }
 
   .article-grid {
-    min-height: 435px;
+    min-height: 372px;
     grid-template-columns: 1fr 1fr;
     border-bottom-width: 2px;
     overflow: hidden;
@@ -1152,8 +1311,8 @@ button {
   }
 
   .stories-section {
-    min-height: 1027px;
-    padding: 30px 0 24px;
+    min-height: 735px;
+    padding: 26px 0 18px;
   }
 
   .stories-section .section-title {
@@ -1162,8 +1321,8 @@ button {
   }
 
   .story-frame {
-    height: 935px;
-    margin-top: 20px;
+    height: 635px;
+    margin-top: 18px;
     border-top: 0;
     border-bottom-width: 2px;
   }
@@ -1184,7 +1343,7 @@ button {
   }
 
   .story-side-photo {
-    left: -26px;
+    left: -48px;
     top: 93px;
     width: 80px;
     height: 215px;
@@ -1199,7 +1358,7 @@ button {
   }
 
   .story-peek-photo {
-    right: -26px;
+    right: -48px;
     top: 93px;
     width: 80px;
     height: 215px;
@@ -1258,8 +1417,8 @@ button {
   }
 
   .pressure-section {
-    min-height: 515px;
-    padding: 47px 0 28px;
+    min-height: 482px;
+    padding: 30px 0 22px;
   }
 
   .pressure-inner {
@@ -1291,8 +1450,8 @@ button {
   }
 
   .problems-section {
-    min-height: 556px;
-    padding: 36px 0 31px;
+    min-height: 455px;
+    padding: 28px 0 24px;
   }
 
   .problems-section .section-title {
@@ -1305,7 +1464,7 @@ button {
 
   .problem-grid {
     width: 100%;
-    margin-top: 28px;
+    margin-top: 22px;
     border-width: 2px;
     overflow: hidden;
   }
@@ -1351,8 +1510,8 @@ button {
   }
 
   .author-section {
-    min-height: 677px;
-    padding: 37px 0 27px;
+    min-height: 600px;
+    padding: 28px 0 22px;
   }
 
   .author-grid {
@@ -1364,7 +1523,7 @@ button {
 
   .author-grid .section-title {
     grid-column: 1 / -1;
-    margin-bottom: 27px;
+    margin-bottom: 22px;
     text-align: center;
     font-size: 30px;
   }
@@ -1401,12 +1560,12 @@ button {
     width: 270px;
     height: 260px;
     justify-self: center;
-    margin: 34px 0 0;
+    margin: 24px 0 0;
   }
 
   .gallery-section {
-    min-height: 795px;
-    padding: 38px 0 28px;
+    min-height: 730px;
+    padding: 30px 0 24px;
   }
 
   .gallery-section .section-title {
@@ -1417,18 +1576,18 @@ button {
   .gallery-wrap {
     width: 100%;
     max-width: 100%;
-    margin-top: 28px;
-    padding-bottom: 60px;
+    margin-top: 20px;
+    padding-bottom: 54px;
   }
 
   .gallery-pages {
-    height: 640px;
+    height: 586px;
   }
 
   .gallery-page {
     min-width: 0;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 132px 132px 98px 188px;
+    grid-template-rows: 122px 122px 90px 176px;
     gap: 6px;
   }
 
@@ -1478,16 +1637,16 @@ button {
   }
 
   .cta-section {
-    min-height: 275px;
+    min-height: 218px;
     align-items: flex-start;
-    padding-top: 55px;
+    padding-top: 40px;
   }
 
   .cta-inner h2 {
     max-width: 285px;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 26px;
+    margin-bottom: 20px;
     font-size: 27px;
     line-height: 1.1;
   }
@@ -1500,13 +1659,13 @@ button {
   }
 
   .site-footer {
-    min-height: 353px;
-    padding: 42px 0 36px;
+    min-height: 282px;
+    padding: 36px 0 28px;
   }
 
   .footer-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 34px 18px;
+    gap: 24px 18px;
   }
 
   .footer-grid > div {

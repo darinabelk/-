@@ -1,3 +1,5 @@
+document.documentElement.classList.add("js");
+
 const sliders = document.querySelectorAll("[data-slider]");
 
 sliders.forEach((slider) => {
@@ -116,5 +118,97 @@ if (responsiveLinks.length) {
     mobileMedia.addEventListener("change", updateResponsiveLinks);
   } else {
     mobileMedia.addListener(updateResponsiveLinks);
+  }
+}
+
+const menuToggle = document.querySelector(".menu-toggle");
+const mobileMenu = document.querySelector("#mobileMenu");
+
+if (menuToggle && mobileMenu) {
+  const desktopMedia = window.matchMedia("(min-width: 641px)");
+  const menuLinks = mobileMenu.querySelectorAll("a");
+
+  const setMenuOpen = (isOpen) => {
+    menuToggle.setAttribute("aria-expanded", String(isOpen));
+    menuToggle.setAttribute("aria-label", isOpen ? "Закрыть меню" : "Открыть меню");
+    mobileMenu.hidden = !isOpen;
+    document.documentElement.classList.toggle("nav-open", isOpen);
+    document.body.classList.toggle("nav-open", isOpen);
+  };
+
+  menuToggle.addEventListener("click", () => {
+    setMenuOpen(mobileMenu.hidden);
+  });
+
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", () => setMenuOpen(false));
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !mobileMenu.hidden) {
+      setMenuOpen(false);
+      menuToggle.focus();
+    }
+  });
+
+  const closeOnDesktop = () => {
+    if (desktopMedia.matches) setMenuOpen(false);
+  };
+
+  closeOnDesktop();
+
+  if (typeof desktopMedia.addEventListener === "function") {
+    desktopMedia.addEventListener("change", closeOnDesktop);
+  } else {
+    desktopMedia.addListener(closeOnDesktop);
+  }
+}
+
+const revealTargets = document.querySelectorAll(
+  ".hero-copy, .hero-media, .hero-button, .section-title, .article-photo, .article-content, .myth-wrap, .story-frame, .pressure-illustration, .problem-card, .author-photo, .author-text, .author-illustration, .gallery-wrap, .cta-inner, .site-footer"
+);
+
+if (revealTargets.length) {
+  const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const revealElement = (element) => {
+    element.classList.add("is-visible");
+  };
+
+  revealTargets.forEach((element, index) => {
+    element.classList.add("reveal");
+    element.style.setProperty("--reveal-delay", `${Math.min(index % 4, 3) * 70}ms`);
+  });
+
+  const showAll = () => {
+    revealTargets.forEach(revealElement);
+  };
+
+  if (motionQuery.matches || !("IntersectionObserver" in window)) {
+    showAll();
+  } else {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          revealElement(entry.target);
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        rootMargin: "0px 0px -12% 0px",
+        threshold: 0.16,
+      }
+    );
+
+    requestAnimationFrame(() => {
+      revealTargets.forEach((element) => {
+        const rect = element.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.9) {
+          revealElement(element);
+        } else {
+          observer.observe(element);
+        }
+      });
+    });
   }
 }
